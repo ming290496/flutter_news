@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_news/src/blocs/stories_provider.dart';
 import 'package:flutter_news/src/widgets/news_list_tile.dart';
+import 'package:flutter_news/src/widgets/refresh.dart';
 
 class NewsList extends StatelessWidget {
   @override
@@ -27,12 +28,18 @@ class NewsList extends StatelessWidget {
           );
         }
 
-        return ListView.builder(
+        return Refresh(
+          child: ListView.builder(
             itemCount: snapshot.data.length,
             itemBuilder: (context, int index) {
               bloc.fetchItem(snapshot.data[index]);
-              return NewsListTile(itemId: snapshot.data[index]);
-            });
+
+              return NewsListTile(
+                itemId: snapshot.data[index],
+              );
+            },
+          ),
+        );
       },
     );
   }
