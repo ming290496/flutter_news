@@ -6,23 +6,23 @@ import 'dart:async';
 import 'package:flutter_news/src/models/item_model.dart';
 import 'repository.dart';
 
-class NewsDbProvider implements Source, Cache{
+class NewsDbProvider implements Source, Cache {
   Database db;
 
-  NewsDbProvider(){
+  NewsDbProvider() {
     init();
   }
 
-  Future<List<int>> fetchTopIds(){
+  Future<List<int>> fetchTopIds() {
     return null;
   }
 
   void init() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, "items.db");
-    db = await openDatabase(path,
-        version: 1, onCreate: (Database newDb, int version) {
-          newDb.execute("""
+    db = await openDatabase(path, version: 1,
+        onCreate: (Database newDb, int version) {
+      newDb.execute("""
             CREATE TABLE Items
               (
                 id INTEGER PRIMARY KEY, 
@@ -40,26 +40,29 @@ class NewsDbProvider implements Source, Cache{
                 descendants INTEGER
               )
           """);
-        });
+    });
   }
 
-  Future<ItemModel> fetchItem(int id) async{
+  Future<ItemModel> fetchItem(int id) async {
     final maps = await db.query(
       "ITEMS",
       columns: null,
       where: "id = ?",
       whereArgs: [id],
     );
-
-    if(maps.length > 0){
+    if (maps.length > 0) {
       return ItemModel.fromDb(maps.first);
     }
 
     return null;
   }
 
-  Future<int> addItem(ItemModel item){
-    return db.insert("Items", item.toMap());
+  Future<int> addItem(ItemModel item) {
+    return db.insert(
+      "Items",
+      item.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
   }
 }
 
